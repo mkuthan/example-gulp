@@ -1,27 +1,38 @@
+'use strict';
+
 var gulp = require('gulp'),
-  concat = require('gulp-concat'),
   jshint = require('gulp-jshint'),
-  rename = require('gulp-rename'),
+  sourcemaps = require('gulp-sourcemaps'),
   uglify = require('gulp-uglify');
 
-var karma = require('karma').server;
+var browserify = require('browserify');
 var del = require('del');
+var karma = require('karma').server;
+
+var buffer = require('vinyl-buffer');
+var source = require('vinyl-source-stream');
+
+var pkg = require('./package.json');
 
 gulp.task('clean', function (cb) {
-  del(['dist'], cb)
+  del(['build'], cb);
 });
 
 gulp.task('jshint', function () {
-  return gulp.src(['src/js/**/*.js', 'test/js/**/*.js'])
+  return gulp.src(['gulpfile.js', 'karma.conf.js', 'src/js/**/*.js', 'test/js/**/*.js'])
     .pipe(jshint())
     .pipe(jshint.reporter('jshint-stylish'))
+    .pipe(jshint.reporter('fail'));
 });
 
 gulp.task('test', function (done) {
   karma.start({
     configFile: __dirname + '/karma.conf.js',
     singleRun: true,
-    reporters: ['progress', 'junit']
+    reporters: ['progress', 'junit', 'coverage'],
+    browserify: {
+      debug: true
+    }
   }, done);
 });
 
@@ -29,17 +40,24 @@ gulp.task('watch', function (done) {
   karma.start({
     configFile: __dirname + '/karma.conf.js',
     singleRun: false,
-    reporters: ['progress']
+    reporters: ['progress'],
+    browserify: {
+      debug: false
+    }
   }, done);
 });
 
 gulp.task('build', ['jshint', 'test'], function () {
-  return gulp.src('src/js/**/*.js')
-    .pipe(concat('main.js'))
-    .pipe(gulp.dest('dist/js'))
-    .pipe(rename({suffix: '.min'}))
+  return browserify(__dirname + '/src/js/calculator.js', {
+    debug: true
+  })
+    .bundle()
+    .pipe(source(pkg.name + '.' + pkg.version + '.min.js'))
+    .pipe(buffer())
+    .pipe(sourcemaps.init({loadMaps: true}))
     .pipe(uglify())
-    .pipe(gulp.dest('dist/js'))
+    .pipe(sourcemaps.write('./'))
+    .pipe(gulp.dest('build/'));
 });
 
 gulp.task('default', ['clean'], function () {

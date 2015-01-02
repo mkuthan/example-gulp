@@ -1,14 +1,39 @@
-module.exports = function(config) {
+'use strict';
+
+module.exports = function (config) {
   config.set({
+
     browsers: ['PhantomJS'],
-    frameworks: ['jasmine'],
+
+    frameworks: ['browserify', 'jasmine'],
+
     files: [
-      'src/js/**/*.js',
-      'test/js/**/*.spec.js'
+      'test/js/**/*.js'
     ],
-    logLevel: config.LOG_INFO,
+
+    preprocessors: {
+      'test/js/**/*.js': ['browserify']
+    },
+
+    browserify: {
+      debug: true,
+      transform: [
+        [{
+          ignore: ['test/js/**/*.js', '**/*.html', '**/bower_components/**', '**/node_modules/**']
+        }, 'browserify-istanbul']
+      ]
+    },
+
     junitReporter: {
-      outputFile: 'build/test-results.xml'
+      outputFile: 'build/tests/test-results.xml'
+    },
+
+    coverageReporter: {
+      dir: 'build/coverage',
+      reporters: [
+        {type: 'html', subdir: 'html'},
+        {type: 'cobertura', subdir: '.'}
+      ]
     }
   });
 };
