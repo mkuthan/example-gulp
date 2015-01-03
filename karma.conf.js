@@ -5,7 +5,7 @@ module.exports = function (config) {
 
     browsers: ['PhantomJS'],
 
-    frameworks: ['browserify', 'jasmine'],
+    frameworks: ['jasmine', 'browserify'],
 
     files: [
       'test/js/**/*.js'
@@ -15,13 +15,11 @@ module.exports = function (config) {
       'test/js/**/*.js': ['browserify']
     },
 
+    logLevel: 'LOG_DEBUG',
+
     browserify: {
       debug: true,
-      transform: [
-        [{
-          ignore: ['test/js/**/*.js', '**/*.html', '**/bower_components/**', '**/node_modules/**']
-        }, 'browserify-istanbul']
-      ]
+      transform: ['browserify-istanbul']
     },
 
     junitReporter: {

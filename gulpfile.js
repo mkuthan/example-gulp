@@ -29,10 +29,7 @@ gulp.task('test', function (done) {
   karma.start({
     configFile: __dirname + '/karma.conf.js',
     singleRun: true,
-    reporters: ['progress', 'junit', 'coverage'],
-    browserify: {
-      debug: true
-    }
+    reporters: ['progress', 'junit', 'coverage']
   }, done);
 });
 
@@ -40,10 +37,7 @@ gulp.task('watch', function (done) {
   karma.start({
     configFile: __dirname + '/karma.conf.js',
     singleRun: false,
-    reporters: ['progress'],
-    browserify: {
-      debug: false
-    }
+    reporters: ['progress']
   }, done);
 });
 
